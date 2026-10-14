@@ -1,0 +1,79 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mehar G Pizza – Okara</title><meta name="theme-color" content="#7a0c14">
+<style>
+:root{--m:#7a0c14;--y:#ffd21f;--k:#1d1512}
+*{box-sizing:border-box}body{margin:0;font:16px/1.4 Georgia,serif;background:#fff6d6;color:var(--k)}
+header{background:var(--m);color:var(--y);padding:18px 16px;text-align:center}
+header h1{margin:0;font-size:34px;letter-spacing:.5px}header p{margin:4px 0 0;color:#fff;font:14px system-ui,sans-serif}
+#bn{background:var(--y);padding:8px;text-align:center;font:700 15px system-ui,sans-serif}#bn:empty{display:none}
+#cl{background:#222;color:#fff;padding:10px;text-align:center;font:15px system-ui,sans-serif;display:none}
+nav{position:sticky;top:0;background:var(--y);display:flex;overflow-x:auto;gap:6px;padding:8px;z-index:5}
+button,select,input,textarea{font:16px system-ui,sans-serif}
+nav button{border:0;border-radius:20px;padding:8px 14px;background:#fff;font-weight:700;white-space:nowrap;cursor:pointer}
+nav .on{background:var(--m);color:var(--y)}
+main{max-width:760px;margin:auto;padding:6px 10px 100px}
+.c{background:#fff;border-left:6px solid var(--m);border-radius:6px;padding:12px 14px;margin:10px 0}
+.c h3{margin:0;font-size:20px}.c p{margin:4px 0 0;color:#5a4a44;font:14px system-ui,sans-serif}
+.r{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:10px}
+select,input,textarea{padding:10px;border:1px solid #b9a98a;border-radius:6px;width:100%}.r select{width:auto;max-width:62%}
+.b{background:var(--m);color:var(--y);border:0;border-radius:6px;padding:10px 18px;font-weight:700;cursor:pointer}
+.so{opacity:.55}
+.q{display:flex;align-items:center;gap:8px}.q button{width:32px;height:32px;border-radius:50%;border:0;background:var(--m);color:var(--y);font-size:19px;cursor:pointer}
+.ln{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #eee;font-family:system-ui,sans-serif;font-size:15px}
+#bar{position:fixed;bottom:0;left:0;right:0;background:var(--m);color:var(--y);padding:12px 16px;display:none;justify-content:space-between;align-items:center;font:700 16px system-ui,sans-serif}
+#bar button{background:var(--y);color:var(--m);border:0;border-radius:6px;padding:10px 16px;font-weight:700;cursor:pointer}
+#sh{position:fixed;inset:0;background:#000a;display:none;z-index:9}
+#sh>div{background:#fff;max-width:520px;margin:16px auto;max-height:92vh;overflow:auto;border-radius:10px;padding:16px}
+#sh input,#sh textarea,#sh select{margin:5px 0}#er{color:#b00020;min-height:20px;font-family:system-ui,sans-serif}
+footer{text-align:center;padding:16px;font:13px system-ui,sans-serif;color:#5a4a44}
+:focus-visible{outline:3px solid #0057d8;outline-offset:2px}
+</style></head><body>
+<header><h1>Mehar G Pizza</h1><p>Depalpur Chowk, Okara · Open 11 AM to 2 AM</p></header>
+<div id="bn"></div><div id="cl"></div><nav id="nav"></nav><main id="mn"></main>
+<div id="bar"><span id="bt"></span><button onclick="op()">View order</button></div>
+<div id="sh"><div><h2 style="margin-top:0">Your order</h2><div id="ls"></div>
+<select id="ty" onchange="tot()"><option>Delivery</option><option>Take Away</option><option>Dine In</option></select>
+<input id="nm" placeholder="Your name" autocomplete="name"><input id="ph" type="tel" placeholder="Phone number" autocomplete="tel"><textarea id="ad" rows="2" placeholder="Delivery address"></textarea>
+<p id="tt"></p><p id="er"></p>
+<button class="b" style="width:100%" onclick="go()">Send order on WhatsApp</button>
+<button style="width:100%;margin-top:8px;padding:10px;border:0;background:#eee;border-radius:6px;cursor:pointer" onclick="$('sh').style.display='none'">Keep browsing</button></div></div>
+<footer>Minimum delivery order Rs. 800 · Dine In · Take Away · Delivery</footer>
+<script src="menu-data.js"></script>
+<script>
+const $=s=>document.getElementById(s),rs=n=>'Rs. '+n.toLocaleString('en-US');
+let S={wa:'923093006072',minDel:800,fee:0,open:true,banner:''},O={items:{},custom:[]},cart={},cat=0,C=[];
+try{cart=JSON.parse(localStorage.mgc||'{}')}catch(e){}
+function build(){C=MENU.map(c=>{
+ const base=c.i.map(([id,n,d,p,z])=>{const o=O.items[id]||{};return{id,n:o.n||n,d,p:o.p||p,z,off:o.off,so:o.so}});
+ const extra=(O.custom||[]).filter(x=>x.c===c.id).map(x=>({id:x.id,n:x.n,d:x.d||'',p:[x.p],off:x.off,so:x.so}));
+ return{t:c.t,i:base.concat(extra).filter(x=>!x.off)}}).filter(c=>c.i.length)}
+const find=id=>{for(const c of C)for(const x of c.i)if(x.id===id)return x};
+function isOpen(){const h=new Date().getHours();return S.open!==false&&(h>=11||h<2)}
+function render(){
+ $('nav').innerHTML=C.map((c,k)=>`<button class="${k==cat?'on':''}" onclick="cat=${k};render()">${c.t}</button>`).join('');
+ const c=C[cat]||C[0];if(!c)return;
+ $('mn').innerHTML=c.i.map(x=>{const z=x.z?SZ[x.z]:[];
+  const sel=x.p.length>1?`<select id="s_${x.id}" aria-label="Size">${x.p.map((p,k)=>`<option value="${k}">${z[k]||''} – ${rs(p)}</option>`).join('')}</select>`:`<b>${rs(x.p[0])}</b>`;
+  return `<div class="c ${x.so?'so':''}"><h3>${x.n}</h3>${x.d?`<p>${x.d}</p>`:''}<div class="r">${sel}${x.so?'<b>Sold out</b>':`<button class="b" onclick="add('${x.id}')">Add</button>`}</div></div>`}).join('')}
+function add(id){const x=find(id),e=$('s_'+id),k=e?+e.value:0,key=id+'|'+k;
+ const l=cart[key]||(cart[key]={id,k,n:x.n,l:x.z?SZ[x.z][k]:'',p:x.p[k],q:0});l.q++;save()}
+function save(){localStorage.mgc=JSON.stringify(cart);const L=Object.values(cart),n=L.reduce((a,l)=>a+l.q,0),s=L.reduce((a,l)=>a+l.q*l.p,0);
+ $('bar').style.display=n?'flex':'none';$('bt').textContent=n+' items · '+rs(s);if($('sh').style.display=='block')op()}
+function chg(key,d){const l=cart[key];l.q+=d;if(l.q<1)delete cart[key];save();if(!Object.keys(cart).length)$('sh').style.display='none'}
+function sub(){return Object.values(cart).reduce((a,l)=>a+l.q*l.p,0)}
+function tot(){const d=$('ty').value=='Delivery',f=d?(+S.fee||0):0;$('ad').style.display=d?'':'none';
+ $('tt').innerHTML=`<b>Total: ${rs(sub()+f)}</b>`+(f?` (includes delivery ${rs(f)})`:'')+(d?`<br><small>Minimum delivery order ${rs(S.minDel)}</small>`:'')}
+function op(){$('ls').innerHTML=Object.entries(cart).map(([k,l])=>`<div class="ln"><span>${l.n}${l.l?' ('+l.l+')':''}<br>${rs(l.p)}</span><span class="q"><button onclick="chg('${k}',-1)" aria-label="Less">−</button>${l.q}<button onclick="chg('${k}',1)" aria-label="More">+</button></span></div>`).join('');
+ $('sh').style.display='block';tot()}
+function go(){const t=$('ty').value,nm=$('nm').value.trim(),ph=$('ph').value.trim(),ad=$('ad').value.trim(),er=$('er');
+ if(!isOpen())return er.textContent='We are closed right now. Please order between 11 AM and 2 AM.';
+ if(!nm)return er.textContent='Please enter your name.';
+ if(ph.replace(/\D/g,'').length<10)return er.textContent='Please enter a valid phone number.';
+ if(t=='Delivery'){if(!ad)return er.textContent='Please enter your delivery address.';if(sub()<S.minDel)return er.textContent='Delivery needs at least '+rs(S.minDel)+'. Add '+rs(S.minDel-sub())+' more or choose Take Away.'}
+ er.textContent='';const L=Object.values(cart),f=t=='Delivery'?(+S.fee||0):0,total=sub()+f;
+ const lines=L.map(l=>({n:l.n,l:l.l,q:l.q,p:l.p}));
+ fetch('/api/orders',{method:'POST',keepalive:true,headers:{'content-type':'application/json'},body:JSON.stringify({type:t,name:nm.slice(0,60),ph:ph.slice(0,20),ad:ad.slice(0,200),lines,total})}).catch(()=>{});
+ const msg=`*New Order – Mehar G Pizza*\nType: ${t}\nName: ${nm}\nPhone: ${ph}\n${t=='Delivery'?'Address: '+ad+'\n':''}\n`+L.map(l=>`${l.q} x ${l.n}${l.l?' ('+l.l+')':''} = ${rs(l.q*l.p)}`).join('\n')+(f?`\nDelivery: ${rs(f)}`:'')+`\n*Total: ${rs(total)}*`;
+ cart={};save();$('sh').style.display='none';window.open('https://wa.me/'+S.wa+'?text='+encodeURIComponent(msg),'_blank')}
+function start(){build();$('bn').textContent=S.banner||'';if(!isOpen()){$('cl').style.display='block';$('cl').textContent=S.open===false?'We are closed right now.':'We are closed right now. Open daily 11 AM to 2 AM.'}render();save()}
+fetch('/api/menu').then(r=>r.json()).then(d=>{if(d.s)S={...S,...d.s};if(d.o)O={items:{},custom:[],...d.o}}).catch(()=>{}).finally(start);
+</script></body></html>
