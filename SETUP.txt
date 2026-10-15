@@ -1,0 +1,19 @@
+MEHAR G PIZZA - SETUP (ek baar)
+1. GitHub par nayi repository banayen (naam: mehar-g).
+2. SAARI files upload karein. ZAROORI: netlify/functions/menu.mjs apne folder samet jaye.
+   Agar "Upload files" se folder nahi jata to "Create new file" ma naam likhein: netlify/functions/menu.mjs aur code paste karein.
+3. Netlify > Add new site > Import from GitHub > mehar-g > Deploy (build command khali).
+4. Site configuration > Environment variables > ADMIN_PASSWORD (apna password) > phir Trigger deploy.
+5. Check: SITE/api/menu kholein -> {"s":{},"o":{"items":{},"custom":[]}} dikhna chahiye.
+6. SITE/admin par login karein.
+Admin: Orders (naye orders, status, aaj ki sales) / Menu (price, hide, sold out, naye items) / Settings (WhatsApp, delivery, band/khula).
+
+PHOTO CHANGE (naya)
+- Admin > Menu mein har item ke neeche "Change photo" button hai (naye items ke liye bhi). Photo chunte hi khud chhoti ho kar save ho jati hai.
+- "Reset photo" se original photo wapas aa jati hai.
+- GitHub mein netlify/functions/menu.mjs, admin.html aur index.html teeno dobara replace karein.
+
+APP INSTALL (naya)
+- Customer app: site kholein > neeche "Install App" button (iPhone: Safari Share > Add to Home Screen).
+- Admin app: SITE/admin kholein > upar "Install app" button. Admin ka alag icon (MG ADMIN) banega.
+- Nayi files bhi GitHub par upload karein: manifest.webmanifest, admin.webmanifest, sw.js, offline.html, icon-192.png, icon-512.png, admin-icon-192.png, admin-icon-512.png, aur updated index.html, admin.html, netlify.toml.

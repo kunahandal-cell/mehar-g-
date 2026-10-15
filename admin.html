@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mehar G Admin</title><meta name="robots" content="noindex">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mehar G Admin</title><meta name="robots" content="noindex"><link rel="manifest" href="/admin.webmanifest"><meta name="theme-color" content="#7a0c14"><link rel="icon" href="/admin-icon-192.png"><link rel="apple-touch-icon" href="/admin-icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MG Admin">
 <style>
 *{box-sizing:border-box}body{margin:0;font:16px/1.4 system-ui,sans-serif;background:#f4efe0;color:#1d1512}
 .top{background:#7a0c14;color:#ffd21f;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
@@ -16,7 +16,7 @@ input,select{font:inherit;padding:8px;border:1px solid #b9a98a;border-radius:6px
 <div id="login" class="wrap" style="max-width:420px;margin-top:60px"><div class="card"><h2 style="margin-top:0">Mehar G Admin</h2>
 <p class="lab">Enter the admin password to manage orders, prices and settings.</p>
 <input id="pw" type="password" placeholder="Password" onkeydown="if(event.key=='Enter')go()"><p id="err"></p><button class="btn" style="width:100%" onclick="go()">Log in</button></div></div>
-<div id="app" style="display:none"><div class="top"><b>Mehar G Admin</b><button class="btn g" onclick="out()">Log out</button></div>
+<div id="app" style="display:none"><div class="top"><b>Mehar G Admin</b><span><button class="btn g" id="ins" style="display:none;margin-right:6px" onclick="inst()">📲 Install app</button><button class="btn g" onclick="out()">Log out</button></span></div>
 <div class="wrap"><div class="tabs"><button id="t0" onclick="tab(0)">Orders</button><button id="t1" onclick="tab(1)">Menu</button><button id="t2" onclick="tab(2)">Settings</button></div>
 <div id="v"></div><button class="btn" id="sv" style="width:100%;margin-top:10px;display:none;position:sticky;bottom:10px;z-index:4;box-shadow:0 4px 14px #0005" onclick="save()">Save changes</button></div></div>
 <div id="msg" role="status"></div>
@@ -25,7 +25,7 @@ input,select{font:inherit;padding:8px;border:1px solid #b9a98a;border-radius:6px
 const $=s=>document.getElementById(s),rs=n=>'Rs. '+Math.round(n).toLocaleString('en-US'),esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 let K=localStorage.mgk||'',D={s:{},o:{items:{},custom:[]}},T=0,OR=[],tm;
 const api=(m,u,b)=>fetch(u,{method:m,headers:{'x-admin-key':K,'content-type':'application/json'},body:b?JSON.stringify(b):undefined});
-const toast=t=>{const m=$('msg');m.textContent=t;m.style.display='block';setTimeout(()=>m.style.display='none',2500)};
+const toast=t=>{const m=$('msg');m.textContent=t;m.style.display='block';setTimeout(()=>m.style.display='none',5000)};
 async function go(){K=$('pw').value||K;try{const r=await api('GET','/api/orders');
  if(r.status==401){$('err').textContent='Wrong password. Try again.';return}
  if(!r.ok){$('err').textContent='Save server not found. Open this page from your Netlify site (/admin).';return}
@@ -65,10 +65,12 @@ function delsec(id){if(!confirm('Delete this section and all items you added to 
 function rem(id){if(!confirm('Remove this item from the menu?'))return;if(cu(id))D.o.custom=D.o.custom.filter(x=>x.id!=id);else it(id).rm=true;menu()}
 function restore(id){delete it(id).rm;menu()}
 function addsec(){const n=$('ns').value.trim();if(!n)return toast('Enter a section name');if(D.o.sec.length>=20)return toast('Section limit reached');D.o.sec.push({id:'s'+Date.now().toString(36),t:n.slice(0,40)});menu();toast('Section added. Add items, then press Save changes.')}
-function shrink(f){return new Promise((ok,no)=>{const im=new Image(),u=URL.createObjectURL(f);im.onerror=()=>no();im.onload=()=>{let w=Math.min(800,im.width),q=.82;for(let i=0;i<6;i++){const h=Math.round(im.height*w/im.width),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);let d=c.toDataURL('image/webp',q);if(!d.startsWith('data:image/webp'))d=c.toDataURL('image/jpeg',q);if(d.length<=350000){URL.revokeObjectURL(u);return ok(d)}w=Math.round(w*.8);q=Math.max(.6,q-.06)}no()};im.src=u})}
+function shrink(f){return new Promise((ok,no)=>{const im=new Image(),u=URL.createObjectURL(f);im.onerror=()=>{URL.revokeObjectURL(u);no(new Error('This photo format is not supported (HEIC?). Please pick a JPG or PNG photo.'))};im.onload=()=>{let w=Math.min(800,im.width),q=.82;for(let i=0;i<8;i++){const h=Math.max(1,Math.round(im.height*w/im.width)),c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);let d=c.toDataURL('image/webp',q);if(!d.startsWith('data:image/webp'))d=c.toDataURL('image/jpeg',q);if(d.length<=350000){URL.revokeObjectURL(u);return ok(d)}w=Math.round(w*.8);q=Math.max(.5,q-.06)}URL.revokeObjectURL(u);no(new Error('Photo is too large'))};im.src=u})}
 async function pic(id,inp){const f=inp.files[0];if(!f)return;toast('Uploading photo...');
- try{const d=await shrink(f),r=await fetch('/api/img?id='+id,{method:'PUT',headers:{'x-admin-key':K,'content-type':'text/plain'},body:d});if(!r.ok)throw 0;
-  (cu(id)||it(id)).iv=Date.now();const r2=await api('PUT','/api/menu',D);toast(r2.ok?'Photo saved':'Photo uploaded, press Save changes');menu()}catch(e){toast('Could not upload photo')}}
+ try{const d=await shrink(f);let r;try{r=await fetch('/api/img?id='+encodeURIComponent(id),{method:'PUT',headers:{'x-admin-key':K,'content-type':'text/plain'},body:d})}catch(e){throw new Error('No connection')}
+  if(!r.ok){let m='';try{m=(await r.json()).error||''}catch(e){}
+   throw new Error(r.status==401?'Wrong password. Log out and log in again.':r.status==404||r.status==405?'Server is missing the photo function. Re-upload netlify/functions/menu.mjs to GitHub and redeploy.':'Server error '+r.status+(m?': '+m:''))}
+  (cu(id)||it(id)).iv=Date.now();const r2=await api('PUT','/api/menu',D);toast(r2.ok?'Photo saved':'Photo uploaded, press Save changes');menu()}catch(e){toast('Photo not uploaded: '+(e&&e.message||'unknown error'));inp.value=''}}
 async function unpic(id){if(!confirm('Go back to the original photo?'))return;try{await fetch('/api/img?id='+id,{method:'DELETE',headers:{'x-admin-key':K}})}catch(e){}
  delete (cu(id)||it(id)).iv;const r=await api('PUT','/api/menu',D);toast(r.ok?'Original photo restored':'Press Save changes');menu()}
 function addi(c){const n=$('nn_'+c).value.trim(),d=$('nd_'+c).value.trim(),pv=$('np_'+c).value,p=+pv;if(!n||pv===''||!(p>=0))return toast('Enter a name and price');
@@ -79,5 +81,11 @@ function sets(){const s=D.s;$('v').innerHTML=`<div class="card"><label class="la
  <label style="display:block;margin-top:10px"><input id="op" type="checkbox" style="width:auto" ${s.open===false?'':'checked'}> Accepting orders (untick to close the shop now)</label></div>`}
 async function save(){if(T==2){D.s={wa:$('wa').value.trim(),minDel:+$('md').value||0,fee:+$('fe').value||0,banner:$('bn').value.trim(),open:$('op').checked}}
  const r=await api('PUT','/api/menu',D);toast(r.ok?'Saved. Customers see it within a minute.':'Could not save: '+((await r.json().catch(()=>({}))).error||r.status))}
+let IP=null;const ios=/iphone|ipad|ipod/i.test(navigator.userAgent),stand=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();IP=e;$('ins').style.display=''});
+addEventListener('appinstalled',()=>{IP=null;$('ins').style.display='none'});
+if(ios&&!stand)$('ins').style.display='';
+async function inst(){if(IP){IP.prompt();await IP.userChoice;IP=null;$('ins').style.display='none'}else alert('iPhone: Safari mein Share button dabayen, phir "Add to Home Screen" chunein.')}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
 if(K)go();
 </script></body></html>
